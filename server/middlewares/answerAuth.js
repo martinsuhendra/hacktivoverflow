@@ -1,10 +1,10 @@
 const { verify } = require('../helpers/jwt')
-const Question = require('../models/questionModel')
+const Answer = require('../models/answerModel')
 
 module.exports = (req, res, next) => {
     const decoded = verify(req.headers.token)
-    Question
-        .findOne({ _id: req.params.questionId })
+    Answer
+        .findOne({ _id: req.params.answerId })
         .populate('user')
         .then((findOneQuestion) => {
             if (findOneQuestion.user.email === decoded.email) next()

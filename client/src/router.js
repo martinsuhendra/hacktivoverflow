@@ -20,7 +20,27 @@ export default new Router({
     {
       path: '/questions',
       name: 'questions',
-      component: () => import('./views/QuestionPage.vue')
+      component: () => import('./views/QuestionPage.vue'),
+    },
+    {
+      path: '/questions/myList',
+      name: 'myList',
+      component: () => import('./views/MyListQuestion.vue')
+    },
+    {
+      path: '/questions/:questionId',
+      name: 'oneQuestion',
+      component: () => import('./views/QuestionDetails.vue'),
+    },
+    {
+      path: '/answers/:questionId',
+      name: 'answers',
+      component: () => import('./views/AnswerPage.vue'),
+    },
+    {
+      path: '/answers/:answerId',
+      name: 'updateAnswer',
+      component: () => import('./views/updateAnswer.vue'),
     },
   ]
 })

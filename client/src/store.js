@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import VueSweetalert2 from 'vue-sweetalert2';
+import router from './router'
+import { stat } from 'fs';
  
 Vue.use(Vuex)
 Vue.use(VueSweetalert2);
@@ -10,7 +12,11 @@ const baseURL = 'http://localhost:3000'
 export default new Vuex.Store({
   state: {
     auth : "",
-    isLogin : null,
+    isLogin : false,
+    questions : [],
+    answers : [],
+    title : "",
+    answer : ""
   },
   mutations: {
     setAuth(state, value) {
@@ -19,10 +25,23 @@ export default new Vuex.Store({
     setIsLogin(state, value) {
       state.isLogin = true
     },
+    setQuestions(state, value){
+      state.questions = value
+    },
     clearUser(state) {
       state.name = ""
       state.email = ""
       state.password = ""
+    },
+    pushAnswer(state, value) {
+      state.answers.push(value)
+    },
+    setAnswers(state, value) {
+      state.answers = value
+    },
+    setDetailAnswer(state, value) {
+      state.title = value.title,
+      state.answer = value.answer
     }
   },
   actions: {
@@ -50,14 +69,50 @@ export default new Vuex.Store({
                 localStorage.setItem('token', data.token)
                 localStorage.setItem('id', data.details.id)
                 localStorage.setItem('email', data.details.email)
+                router.push({path:"/"})
              })
              .catch( (err) => {
                 Vue.swal("Ooops", err.response.data.message, "warning")
              })
       }
     },
+    getQuestions({commit, dispatch},option) {
+      if (!option) {
+          axios.get(`${baseURL}/questions`)
+               .then(({data})=> {
+                 console.log(data);
+                 commit('setQuestions', data)
+               })
+               .catch((err) => {
+                 console.log(err);
+               })
+      } else {
+        axios.get(`${baseURL}/questions/myList`,{
+          headers : {
+            token : localStorage.getItem('token')
+          }
+        })
+        .then(({data})=> {
+          console.log(data);
+          
+            commit('setQuestions', data)
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+      }
+    },
+    getQuestionDetails({commit, dispatch}, option) {
+      axios.get(`${baseURL}/questions/${option}`)
+           .then(({data}) => {
+             console.log(data);
+             commit('setQuestions', data)
+           })
+           .catch((err) => {
+             console.log(err);
+           })
+    },
     createQuestion({commit, dispatch}, newQuestion) {
-      // console.log(newQuestion,'===');
       let {title, description, user} = newQuestion
       axios.post(`${baseURL}/questions`, 
             { title, description, user },
@@ -67,10 +122,147 @@ export default new Vuex.Store({
             })
             .then(({data}) => {
               console.log(data);
+              router.push({path:"/"})
+              Vue.swal("Nice!",data.message,"success");
             })
             .catch((err) => {
-              console.log(err.response);
+              Vue.swal("Sorry...",err.response.data.message,"warning");
             })
+    },
+    createAnswer({commit, dispatch}, newAnswer) {
+      
+       axios.post(`${baseURL}/answers`,newAnswer,{
+         headers : {
+           token : localStorage.getItem('token')
+         }
+       })
+       .then(({data}) => {
+       
+          commit('pushAnswer', data.data)
+          router.push({path:`/questions/${data.data._id}`})
+          Vue.swal("Nice!",data.message,"success");
+       })
+       .catch((err) => {
+        Vue.swal("Sorry...",err.response.data.message,"warning");
+      })
+    },
+    getAnswer({commit, dispatch}, option) {
+
+        axios.get(`${baseURL}/answers/${option}`)
+        .then(({data}) => {
+          commit('setAnswers', data)
+        })
+        .catch((err) => {
+          console.log(err.message);
+        })
+    },
+    upvote({commit, dispatch}, option) {
+        if (option.answerId) {
+          axios
+          .put(`${baseURL}/${option.value}/${option.answerId}/upvote`,{},{
+            headers : { token : localStorage.getItem('token')}
+          })
+          .then(({data}) => {
+              console.log(data);
+          })
+          .catch(err => {
+            console.log(err.message);
+          })
+        } else {
+          console.log(option,'==== masuk');
+          
+          axios
+          .put(`${baseURL}/${option.value}/${option.questionId.questionId}/upvote`,{},{
+            headers : {
+              token : localStorage.getItem('token')
+            }
+          })
+          .then(({data}) => {
+              console.log(data);
+          })
+          .catch(err => {
+            console.log(err.message);
+          })
+        }
+       
+    },
+    downvote({commit, dispatch}, option) {
+      if (option.answerId) {
+        axios
+        .put(`${baseURL}/${option.value}/${option.answerId}/downvote`,{},{
+          headers : {
+            token : localStorage.getItem('token')
+          }
+        })
+        .then(({data}) => {
+            console.log(data);
+        })
+        .catch(err => {
+          console.log(err.message);
+        })
+      } else {
+        axios
+        .put(`${baseURL}/${option.value}/${option.questionId.questionId}/downvote`,{},{
+          headers : {
+            token : localStorage.getItem('token')
+          }
+        })
+        .then(({data}) => {
+            console.log(data);
+        })
+        .catch(err => {
+          console.log(err.message);
+        })
+      }
+   
+    },
+    updateAnswer({commit, dispatch}, option) {
+    
+      let {answerId, title, description} = option
+      axios
+        .put(`${baseURL}/answers/${answerId}`, {
+          title, description
+        },{
+          headers : {
+            token : localStorage.getItem('token'),
+            email : localStorage.getItem('email'),
+            id : localStorage.getItem('id')
+          }
+        })
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((err)=> {
+          console.log(err);
+        })
+    },
+    deleteAnswer({commit, dispatch}, option) {
+      let {answerId, title, description} = option
+      axios
+        .delete(`${baseURL}/answers/${answerId}`, {
+          title, description
+        },{
+          headers : {
+            token : localStorage.getItem('token'),
+            email : localStorage.getItem('email'),
+            id : localStorage.getItem('id')
+          }
+        })
+    },
+    getAnswerDetails({commit, dispatch}, option) {
+      console.log(option, '=========');
+      
+      axios
+          .get(`${baseURL}/answers/detail/${option.answerId}`)
+          .then(({data}) => {
+            commit('setDetailAnswer', {
+              title : data.title,
+              answer : data.description
+            })
+          })
+          .catch((err) => {
+            console.log(err);
+          })
     }
   }
 })

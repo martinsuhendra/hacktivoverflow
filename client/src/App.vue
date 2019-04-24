@@ -14,11 +14,15 @@
 
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
-          <router-link to = "/auth">
-            <v-icon dark v-on="on" @click="getAuth('login')">account_circle</v-icon>
+          <router-link to = "/auth" v-if="!isLogin">
+            <v-icon dark v-on="on" @click="getAuth('login')">lock_open</v-icon>
+          </router-link>
+          <router-link to = "/"  v-else-if="isLogin">
+            <v-icon dark v-on="on" @click="clear">lock_outline</v-icon>
           </router-link>
         </template>
-        <span>Login</span>
+        <span v-if="!isLogin">Login</span>
+        <span v-else-if="isLogin">Logout</span>
       </v-tooltip>
 
       <div></div>
@@ -36,7 +40,7 @@
     <v-container grid-list-md fluid>
       <v-layout row wrap>
         <!-- LEFT -->
-        <v-flex xs3>
+        <v-flex xs2>
           <div>
             <router-link to = "/" style="text-decoration: none">
               <v-btn color="blue-grey" class="white--text">
@@ -46,20 +50,20 @@
             </router-link>
           </div>
           <div>
-            <v-btn color="blue-grey" class="white--text">
+            <v-btn color="blue-grey" class="white--text" @click="getUserQuestions">
               Users
               <v-icon right dark>person</v-icon>
             </v-btn>
           </div>
         </v-flex>
         <!-- CENTER -->
-        <v-flex xs6 grow pa-1>
+        <v-flex xs8 grow pa-1>
           <v-content>
             <router-view></router-view>
           </v-content>
         </v-flex>
         <!-- RIGHT -->
-        <v-flex xs3></v-flex>
+        <v-flex xs2></v-flex>
       </v-layout>
     </v-container>
   </v-app>
@@ -76,10 +80,31 @@ export default {
       items: ["Home", "Users"]
     };
   },
-  computed: {},
+  created() {
+    if (localStorage.getItem('token')) {
+      this.$store.state.isLogin = true
+    } else {
+      this.$store.state.isLogin = false
+    }
+  },
+  computed: {
+    ...mapState(["isLogin"])
+  },
   methods: {
+    clear() {
+      localStorage.clear()
+      this.$store.state.isLogin = false
+      this.$swal("success","Successfully logout","success")
+    },
     getAuth(value) {
       this.setAuth(value);
+    },
+    getUserQuestions() {
+      if (!localStorage.getItem('token')) {
+         this.$swal("Sorry","Please login to continue","warning")
+      } else {
+         this.$router.push({ path: `/questions/myList` });
+      }
     },
     ...mapMutations(["setAuth"])
   }

@@ -4,6 +4,7 @@ const app = express()
 const port = process.env.PORT || 3000
 const userRoutes = require('./routes/userRoutes')
 const questionRoutes = require('./routes/questionRoutes')
+const answerRoutes = require('./routes/answerRoutes')
 const cors = require('cors')
 
 const mongoose = require('mongoose')
@@ -13,8 +14,9 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 app.use(cors())
 
-app.use('/users', userRoutes)
-app.use('/questions', questionRoutes)
+app.use('/users', userRoutes);
+app.use('/questions', questionRoutes);
+app.use('/answers',answerRoutes)
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`)

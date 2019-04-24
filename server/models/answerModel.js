@@ -26,7 +26,7 @@ const answerSchema = new Schema({
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Users',
+        ref: 'User',
         required: [true, 'User is required'],
     },
     createdAt: {

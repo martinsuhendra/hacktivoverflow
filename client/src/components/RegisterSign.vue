@@ -11,7 +11,7 @@
   </form>
 
   <!-- LOGIN -->
-  <form v-else-if="this.$store.state.auth == 'login'">
+  <form v-else-if="this.$store.state.auth == 'login' || this.$store.state.isLogin == false">
     <h2 class="text-xs-center">Login Form</h2>
     <v-text-field v-model="email" label="E-mail" required></v-text-field>
     <v-text-field type="password" v-model="password" label="Password" required></v-text-field>

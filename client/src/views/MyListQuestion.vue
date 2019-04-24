@@ -1,10 +1,13 @@
 <template>
-  <v-container grid-list-md text-xs-center fluid>
+    <div v-if="!questions.length">
+        <img src="../../public/undraw_no_data_qbuo.svg" alt="" srcset="" style="max-width: 100%;">
+    </div>
+  <v-container grid-list-md text-xs-center fluid v-else>
     <v-layout row wrap align-start justify-start>
       <div class="display-1 font-weight-light">Top Question</div>
       <v-spacer></v-spacer>
       <div>
-        <v-btn color="info" @click="getQuestion">Ask Question</v-btn>
+        <v-btn color="info">Ask Question</v-btn>
       </div>
     </v-layout>
     <br>
@@ -29,9 +32,7 @@
         <span class="body-1">Answers</span>
       </v-flex>
       <v-flex xs10 class="title pl-4">
-        <router-link :to="{ name: 'oneQuestion', params: { questionId: question._id }}">
-            <div class="subheading text-truncate mb-2">{{question.title}}</div>
-        </router-link>
+        <div class="subheading text-truncate mb-2">{{question.title}}</div>
         <span class="caption">author : {{question.user.name}}</span>
       </v-flex>
     </v-layout>
@@ -39,31 +40,26 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+
+import { mapActions, mapState } from 'vuex'
 
 export default {
-  name: "LandingPage",
-  data: () => ({}),
-  created() {
-    this.$store.state.questions = []
-    this.getQuestions();
-  },
-  computed: {
-    ...mapState(["questions"])
-  },
-  methods: {
-    ...mapActions(["getQuestions"]),
-    getQuestion() {
-      if (!localStorage.getItem("token")) {
-        this.$router.push({ path: "/auth" });
-        this.$swal("Ooops", "please login to continue", "warning");
-      } else {
-        this.$router.push({ path: "/questions" });
-      }
-    }
-  }
-};
+    created() {
+      this.$store.state.questions = []
+      this.getQuestions(localStorage.getItem('id'))
+    },
+    computed: {
+        ...mapState(['questions'])
+    },
+    methods: {
+        ...mapActions(['getQuestions'])
+    },
+}
 </script>
 
 <style scoped>
+image.center {
+    position:absolute;
+    z-index:0;
+}
 </style>
