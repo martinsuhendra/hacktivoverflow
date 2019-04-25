@@ -81,11 +81,11 @@ class AnswerController {
   static downvote(req, res) {
     Answer.findById({ _id: req.params.answerId })
       .then(data => {
-        let alreadyVoted = data.user._id == req.authenticatedUser.id;
+        let sameVoter = data.user._id == req.authenticatedUser.id;
         let downVote = data.downvotes.indexOf(req.authenticatedUser.id) < 0;
         let upVote = data.upvotes.indexOf(req.authenticatedUser.id) < 0;
 
-        if (alreadyVoted) {
+        if (sameVoter) {
           res.status(400).json({
             message: "you cannot vote your answer"
           });

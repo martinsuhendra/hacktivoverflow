@@ -1,6 +1,7 @@
 <template>
   <v-container grid-list-md text-xs-center fluid>
     <!-- Questions -->
+    
     <v-layout row wrap align-start justify-start>
       <div class="display-1 font-weight-light">Question</div>
       <v-spacer></v-spacer>
@@ -19,7 +20,7 @@
             <i class="material-icons">arrow_drop_up</i>
           </v-btn>
         </div>
-        <div class="body-1" v-if="questions">{{+questions.upvotes.length - +questions.downvotes.length}}</div>
+        {{countQuestion}}
         <div class="body-2">
           <v-btn fab dark small grey darken-1 @click="getDownvote('questions', questions._id)">
             <i class="material-icons">arrow_drop_down</i>
@@ -51,7 +52,7 @@
             <i class="material-icons">arrow_drop_up</i>
           </v-btn>
         </div>
-        <div class="body-1" v-if="answers">{{+answer.upvotes.length - +answer.downvotes.length}}</div>
+        <div class="body-1" v-if="answers">{{answer.upvotes.length - answer.downvotes.length}}</div>
         <div class="body-2">
           <v-btn fab dark small grey darken-1 @click="getDownvote('answer', answer._id)">
             <i class="material-icons">arrow_drop_down</i>
@@ -73,18 +74,16 @@ export default {
   data() {
     return {
       userId : localStorage.getItem('id'),
+      totalVote : 0
     }
   },
   created() {
-    console.log(this.$route.params,'ini params');
-    
     this.$store.state.questions = [];
     this.getQuestionDetails(this.$route.params.questionId);
     this.getAnswer(this.$route.params.questionId);
   },
   computed: {
-    ...mapState(["questions","answers"]),
-
+    ...mapState(["questions","answers","countQuestion","countAnswer"])
   },
   methods: {
     ...mapActions(["getQuestionDetails", "getAnswer","upvote","downvote","updateAnswer"]),

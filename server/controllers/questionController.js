@@ -58,11 +58,13 @@ class QuestionController {
     }
 
     static upvote(req, res) {
-        console.log(req.params.questionId,'====');
-        
+        let totalVotes = 0;
+        let question = null;
         Question.findById(req.params.questionId)
           .populate("user")
           .then(data => {
+            totalVotes = Math.abs(data.upvotes.length - data.downvotes.length)
+            question = data;
             let downVote = data.downvotes.indexOf(req.authenticatedUser.id) < 0;
             let upVote = data.upvotes.indexOf(req.authenticatedUser.id) < 0;
             let sameVoter = req.authenticatedUser.id == data.user._id;
@@ -88,7 +90,9 @@ class QuestionController {
             }
           })
           .then(results => {
-            res.status(200).json(results);
+            totalVotes = Math.abs(question.upvotes.length - question.downvotes.length)
+            // console.log(totalVotes,'===');
+            res.status(200).json(totalVotes);
           })
           .catch(err => {
             res.status(500).json(err);
@@ -96,12 +100,13 @@ class QuestionController {
       }
     
       static downvote(req, res) {
+        let totalVotes = 0
         Question.findById({ _id: req.params.questionId })
           .then(data => {
             let alreadyVoted = data.user._id == req.authenticatedUser.id;
             let downVote = data.downvotes.indexOf(req.authenticatedUser.id) < 0;
             let upVote = data.upvotes.indexOf(req.authenticatedUser.id) < 0;
-    
+            totalVotes = Math.abs(data.upvotes.length - data.downvotes.length)
             if (alreadyVoted) {
               res.status(400).json({
                 message: "you cannot vote your question"
@@ -123,7 +128,8 @@ class QuestionController {
             }
           })
           .then(data => {
-            res.status(200).json(data);
+            totalVotes = Math.abs(data.upvotes.length - data.downvotes.length)
+            res.status(200).json(totalVotes);
           })
           .catch(err => {
             res.status(500).json(err);

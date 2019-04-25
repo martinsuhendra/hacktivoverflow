@@ -4,6 +4,7 @@ import axios from 'axios'
 import VueSweetalert2 from 'vue-sweetalert2';
 import router from './router'
 import { stat } from 'fs';
+import swal from 'sweetalert2';
  
 Vue.use(Vuex)
 Vue.use(VueSweetalert2);
@@ -16,7 +17,9 @@ export default new Vuex.Store({
     questions : [],
     answers : [],
     title : "",
-    answer : ""
+    answer : "",
+    countQuestion : 0,
+    countAnswer: 0
   },
   mutations: {
     setAuth(state, value) {
@@ -27,6 +30,7 @@ export default new Vuex.Store({
     },
     setQuestions(state, value){
       state.questions = value
+      state.countQuestion = +value.upvotes.length - +value.downvotes.length
     },
     clearUser(state) {
       state.name = ""
@@ -42,6 +46,12 @@ export default new Vuex.Store({
     setDetailAnswer(state, value) {
       state.title = value.title,
       state.answer = value.answer
+    },
+    setCountQuestion(state, value) {
+      state.countQuestion = value
+    },
+    setCountAnswer(state, value) {
+      state.countAnswer = value
     }
   },
   actions: {
@@ -107,6 +117,7 @@ export default new Vuex.Store({
            .then(({data}) => {
              console.log(data);
              commit('setQuestions', data)
+
            })
            .catch((err) => {
              console.log(err);
@@ -157,6 +168,7 @@ export default new Vuex.Store({
         })
     },
     upvote({commit, dispatch}, option) {
+       
         if (option.answerId) {
           axios
           .put(`${baseURL}/${option.value}/${option.answerId}/upvote`,{},{
@@ -164,13 +176,12 @@ export default new Vuex.Store({
           })
           .then(({data}) => {
               console.log(data);
+              commit('setCountAnswer', data)
           })
           .catch(err => {
             console.log(err.message);
           })
         } else {
-          console.log(option,'==== masuk');
-          
           axios
           .put(`${baseURL}/${option.value}/${option.questionId.questionId}/upvote`,{},{
             headers : {
@@ -178,10 +189,12 @@ export default new Vuex.Store({
             }
           })
           .then(({data}) => {
-              console.log(data);
+              console.log(data)
+              commit('setCountQuestion', data)
           })
           .catch(err => {
-            console.log(err.message);
+            console.log(err.response);
+            swal("Oops",err.response.data.message,"warning")
           })
         }
        
@@ -196,9 +209,11 @@ export default new Vuex.Store({
         })
         .then(({data}) => {
             console.log(data);
+            commit('setCountAnswer', data)
         })
         .catch(err => {
           console.log(err.message);
+          swal("Oops",err.response.data.message,"warning")
         })
       } else {
         axios
@@ -209,9 +224,11 @@ export default new Vuex.Store({
         })
         .then(({data}) => {
             console.log(data);
+            commit('setCountQuestion', data)
         })
         .catch(err => {
           console.log(err.message);
+          swal("Oops",err.response.data.message,"warning")
         })
       }
    
@@ -234,6 +251,7 @@ export default new Vuex.Store({
         })
         .catch((err)=> {
           console.log(err);
+          
         })
     },
     deleteAnswer({commit, dispatch}, option) {
