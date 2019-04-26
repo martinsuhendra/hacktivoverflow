@@ -11,7 +11,7 @@ const cron = require('./helpers/cron')
 cron.start()
 
 const mongoose = require('mongoose')
-mongoose.connect('mongodb://localhost/' + process.env.DB_URL, { useNewUrlParser: true })
+mongoose.connect(`mongodb+srv://martinsuhendra:${process.env.ATLAS}@hacktiv8-martin-jldez.mongodb.net/test?retryWrites=true`, { useNewUrlParser: true })
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
