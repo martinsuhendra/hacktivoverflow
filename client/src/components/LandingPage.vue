@@ -15,13 +15,13 @@
       wrap
       align-start
       justify-start
-      v-for="(question, index) in questions"
+      v-for="(question, index) in filtered"
       :key="index"
       class="mb-4"
     >
       <!-- LEFT-->
       <v-flex xs1>
-        <div class="body-2">0</div>
+        <div class="body-2">{{Math.abs(question.upvotes.length - question.downvotes.length)}}</div>
         <span class="body-1">Votes</span>
       </v-flex>
       <v-flex xs1>
@@ -43,13 +43,19 @@ import { mapActions, mapState } from "vuex";
 
 export default {
   name: "LandingPage",
+  props: ['search'],
   data: () => ({}),
   created() {
     this.$store.state.questions = []
     this.getQuestions();
   },
   computed: {
-    ...mapState(["questions"])
+    ...mapState(["questions"]),
+      filtered() {
+            return this.questions.filter((entry)=> {
+                return entry.title.toLowerCase().match(this.search)
+            })
+        }
   },
   methods: {
     ...mapActions(["getQuestions"]),

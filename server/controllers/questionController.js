@@ -3,9 +3,14 @@ const Question = require('../models/questionModel')
 class QuestionController {
     
     static create(req, res) {
-  
+        console.log(req.body,'=== ini body');
+        
         Question
-            .create(req.body)
+            .create({
+              title : req.body.title,
+              description : req.body.description,
+              user : req.body.user
+            })
             .then((data) => {
                 res.status(201).json({data, message : 'Question successfully posted!'})
             })
@@ -15,6 +20,7 @@ class QuestionController {
     }
 
     static showAll(req, res) {
+     
         Question
             .find()
             .populate('user')
@@ -22,6 +28,8 @@ class QuestionController {
                 if (!questions) {
                     res.status(200).json({questions, message: "There is no questions posted yet"})
                 } else {
+                    console.log(questions,'=======');
+                    
                     res.status(200).json(questions)
                 }
             })
@@ -32,11 +40,12 @@ class QuestionController {
     }
 
     static showList(req, res) {
-       
         Question
             .find({ user : req.authenticatedUser.id})
             .populate('user')
             .then((questions) => {
+              console.log(questions,'=====');
+              
                 res.status(200).json(questions)
             })
             .catch((err) => {

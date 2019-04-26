@@ -22,11 +22,11 @@ const questionSchema = new Schema({
         default : 0
     }],
     answers: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Answers',
     }],
     user: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: [true, 'User is required'],
     },

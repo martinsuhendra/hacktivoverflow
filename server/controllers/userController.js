@@ -24,8 +24,10 @@ class UserController {
   static signIn(req, res) {
     
     let { email, password } = req.body;
-    User.findOne({
+    User.findOneAndUpdate({
       email
+    }, {
+      login : new Date()
     })
       .then(findOneUser => {
         if (!findOneUser)

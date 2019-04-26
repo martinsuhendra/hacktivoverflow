@@ -13,15 +13,17 @@ const answerSchema = new Schema({
     },
     upvotes : [{
         type : Schema.Types.ObjectId,
-        ref : 'User'
+        ref : 'User',
+        default : 0
     }],
     downvotes : [{
         type : Schema.Types.ObjectId,
-        ref : 'User'
+        ref : 'User',
+        default : 0
     }],
     question: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Questions',
+        ref: 'Question',
         required: [true, 'Question is required'],
     },
     user: {

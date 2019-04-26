@@ -90,7 +90,7 @@ export default new Vuex.Store({
       if (!option) {
           axios.get(`${baseURL}/questions`)
                .then(({data})=> {
-                 console.log(data);
+                 console.log(data,'ini dataaa');
                  commit('setQuestions', data)
                })
                .catch((err) => {
@@ -234,11 +234,12 @@ export default new Vuex.Store({
    
     },
     updateAnswer({commit, dispatch}, option) {
-    
-      let {answerId, title, description} = option
+      console.log(option,'=== option');
+      
+      let {answerId, title, description, question, user} = option
       axios
         .put(`${baseURL}/answers/${answerId}`, {
-          title, description
+          title, description, question, user
         },{
           headers : {
             token : localStorage.getItem('token'),
@@ -248,10 +249,11 @@ export default new Vuex.Store({
         })
         .then((data) => {
           console.log(data);
+
         })
         .catch((err)=> {
           console.log(err);
-          
+          swal("Nice","update success","warning")
         })
     },
     deleteAnswer({commit, dispatch}, option) {
@@ -267,20 +269,5 @@ export default new Vuex.Store({
           }
         })
     },
-    getAnswerDetails({commit, dispatch}, option) {
-      console.log(option, '=========');
-      
-      axios
-          .get(`${baseURL}/answers/detail/${option.answerId}`)
-          .then(({data}) => {
-            commit('setDetailAnswer', {
-              title : data.title,
-              answer : data.description
-            })
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-    }
   }
 })

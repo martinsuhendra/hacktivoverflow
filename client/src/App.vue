@@ -6,7 +6,7 @@
 
       <v-spacer></v-spacer>
       <v-flex xs12 sm6 md3>
-        <v-text-field placeholder="Search"></v-text-field>
+        <v-text-field placeholder="Search" v-model="search"></v-text-field>
       </v-flex>
       <v-btn icon>
         <v-icon>search</v-icon>
@@ -59,7 +59,7 @@
         <!-- CENTER -->
         <v-flex xs8 grow pa-1>
           <v-content>
-            <router-view></router-view>
+            <router-view :search="search"></router-view>
           </v-content>
         </v-flex>
         <!-- RIGHT -->
@@ -77,7 +77,8 @@ export default {
   components: {},
   data() {
     return {
-      items: ["Home", "Users"]
+      items: ["Home", "Users"],
+      search : ""
     };
   },
   created() {

@@ -12,7 +12,12 @@
 
       <v-flex xs-12>
         <ckeditor :editor="editor" v-model="answer"></ckeditor>
-        <v-btn depressed small color="primary" @click="getUpdateAnswer(this.$route.params.answerId)">Update</v-btn>
+        <v-btn
+          depressed
+          small
+          color="primary"
+          @click="getUpdateAnswer(params)"
+        >Update</v-btn>
         <v-btn depressed small color="primary" @click="clear">Clear</v-btn>
       </v-flex>
     </v-layout>
@@ -21,46 +26,56 @@
 
 <script>
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapState } from "vuex";
+import axios from 'axios';
+const baseURL = 'http://localhost:3000'
 export default {
   name: "Question",
   components: {},
   data() {
     return {
-      title: this.$store.state.title,
+      title: "",
       editor: ClassicEditor,
-      answer: this.$store.state.answer
+      answer: "",
+      params : "",
+      question: "",
+      user : ""
     };
   },
   created() {
-      this.getAnswerDetails(this.$route.params)
+    this.params = this.$route.params.answerId;
+    
+    axios
+      .get(`${baseURL}/answers/detail/${this.$route.params.answerId}`)
+      .then(({ data }) => {
+          this.title = data.title,
+          this.answer = data.description
+          this.question = data.question
+          this.user = data.user._id
+      })
+      .catch(err => {
+        console.log(err);
+      });
   },
   methods: {
-      clear() {
-          this.answer = "",
-          this.title = ""
-      },
-      setQuestion() {
-          let newQuestion = {
-              title : this.title,
-              description : this.question,
-              user : localStorage.getItem('id')
-          }
-          this.createQuestion(newQuestion)
-      },
-      getUpdateAnswer(id) {
-        this.updateAnswer({answerId : id})  
-      },
-      ...mapActions(['createQuestion','getAnswerDetails','updateAnswer'])
+    clear() {
+      (this.answer = ""), (this.title = "");
+    },
+    getUpdateAnswer(id) {
+      this.updateAnswer({ answerId: id, title: this.title, description: this.answer, question: this.question, user: this.user});
+    },
+    ...mapActions(["createQuestion", "getAnswerDetails", "updateAnswer"])
   },
   computed: {
-      ...mapState(['title, answer']),
+    ...mapState(["title, answer"]),
     progress() {
       return Math.min(100, this.title.length * 10);
     },
     color() {
       return ["error", "warning", "success"][Math.floor(this.progress / 40)];
     }
+  },
+  mounted() {
   }
 };
 </script>

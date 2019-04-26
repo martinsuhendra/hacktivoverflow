@@ -7,6 +7,9 @@ const questionRoutes = require('./routes/questionRoutes')
 const answerRoutes = require('./routes/answerRoutes')
 const cors = require('cors')
 
+const cron = require('./helpers/cron')
+cron.start()
+
 const mongoose = require('mongoose')
 mongoose.connect('mongodb://localhost/' + process.env.DB_URL, { useNewUrlParser: true })
 

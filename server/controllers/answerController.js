@@ -24,6 +24,7 @@ class AnswerController {
     Answer.find({
       question: req.params.questionId
     })
+      .populate("user")
       .then(data => {
         res.status(200).json(data);
       })
@@ -34,6 +35,7 @@ class AnswerController {
 
   static showOne(req, res) {
     Answer.findById(req.params.answerId)
+      .populate("user")
       .then(data => {
         res.status(200).json(data);
       })
@@ -79,6 +81,8 @@ class AnswerController {
   }
 
   static downvote(req, res) {
+    console.log(req.params);
+    
     Answer.findById({ _id: req.params.answerId })
       .then(data => {
         let sameVoter = data.user._id == req.authenticatedUser.id;
@@ -114,17 +118,18 @@ class AnswerController {
   }
 
   static update(req, res) {
-    let { title, description } = req.body;
-    Answer.findByIdAndUpdate(
-      {
-        _id: req.params.id
-      },
+
+    let { title, description, question, user } = req.body;
+    Answer.findByIdAndUpdate(req.params.answerId,
       {
         title,
-        description
+        description,
+        question, 
+        user 
       }
     )
       .then(data => {
+        console.log(data);
         res.status(200).json(data);
       })
       .catch(err => {

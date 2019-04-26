@@ -33,6 +33,9 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    login: {
+        type : Date,
+    }
 })
 
 
